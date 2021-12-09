@@ -11,9 +11,8 @@ import android.widget.TextView;
 import com.foxrider.mt_lab2.model.Meme;
 import com.squareup.picasso.Picasso;
 
-import java.util.ArrayList;
 import java.util.List;
-
+// from  https://evileg.com/ru/post/232/ с моими доработками
 public class MyListAdapter extends BaseAdapter {
 
     /*

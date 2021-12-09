@@ -58,10 +58,6 @@ public class Fragment1 extends Fragment {
                 } else {
 
                     memes = response.body().getData().getMemes();
-//                    ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1, memes.stream()
-//                            .map(Meme::getName)
-//                            .collect(Collectors.toList()));
-
                     MyListAdapter adapter = new MyListAdapter(getContext(),  memes);
 
                     ListView messageList = view.findViewById(R.id.listView);
