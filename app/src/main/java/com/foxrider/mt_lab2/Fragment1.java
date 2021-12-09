@@ -14,8 +14,14 @@ import android.widget.Toast;
 import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 
-import com.foxrider.mt_lab2.model.NameDescription;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.foxrider.mt_lab2.model.Meme;
+import com.foxrider.mt_lab2.model.MemeResponse;
 import com.foxrider.mt_lab2.model.RetrofitClient;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -28,7 +34,8 @@ public class Fragment1 extends Fragment {
 
 
     private View view;
-    public List<NameDescription> nameDescriptions;
+    public MemeResponse memeResponse;
+    public List<Meme> memes;
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
@@ -41,18 +48,18 @@ public class Fragment1 extends Fragment {
 
 
     private void getModel(View view) {
-        Call<List<NameDescription>> call = RetrofitClient.getInstance().getMyApi().getModel();
-        call.enqueue(new Callback<List<NameDescription>>() {
+        Call<MemeResponse> call = RetrofitClient.getInstance().getMyApi().getModel();
+        call.enqueue(new Callback<MemeResponse>() {
             @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
-            public void onResponse(Call<List<NameDescription>> call, Response<List<NameDescription>> response) {
+            public void onResponse(Call<MemeResponse> call, Response<MemeResponse> response) {
                 if (!response.isSuccessful()) {
                     Toast.makeText(getContext(), "404", Toast.LENGTH_SHORT).show();
                 } else {
 
-                    nameDescriptions = response.body();
-                    ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1, nameDescriptions.stream()
-                            .map(NameDescription::getName)
+                    memes = response.body().getData().getMemes();
+                    ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1, memes.stream()
+                            .map(Meme::getName)
                             .collect(Collectors.toList()));
 
                     ListView messageList = view.findViewById(R.id.listView);
@@ -64,9 +71,22 @@ public class Fragment1 extends Fragment {
                         @Override
                         public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
                             // получаем выбранный элемент
-                            String selectedItemDescription = nameDescriptions.get(position).getDescription();
+                            String prettyString = null;
+                            try {
+                                String selectedItemDescription = new ObjectMapper().writeValueAsString(memes.get(position));
+                                JSONObject json = new JSONObject(selectedItemDescription);
+                                prettyString = json.toString(4);
+
+                            } catch (JsonProcessingException e) {
+                                e.printStackTrace();
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+
+                            System.out.println(); // Print it with specified indentation
+
                             Intent intent = new Intent(getContext(), DetailsActivity.class);
-                            intent.putExtra("desc", selectedItemDescription);
+                            intent.putExtra("desc", prettyString);
                             startActivity(intent);
                         }
                     });
@@ -74,7 +94,7 @@ public class Fragment1 extends Fragment {
             }
 
             @Override
-            public void onFailure(Call<List<NameDescription>> call, Throwable t) {
+            public void onFailure(Call<MemeResponse> call, Throwable t) {
                 Toast.makeText(getContext(), "Connection error", Toast.LENGTH_SHORT).show();
             }
 
