@@ -7,7 +7,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -16,15 +15,14 @@ import androidx.fragment.app.Fragment;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.foxrider.mt_lab2.model.Meme;
-import com.foxrider.mt_lab2.model.MemeResponse;
+import com.foxrider.mt_lab2.model.Entry;
+import com.foxrider.mt_lab2.model.Pic;
 import com.foxrider.mt_lab2.model.RetrofitClient;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -34,8 +32,7 @@ public class Fragment1 extends Fragment {
 
 
     private View view;
-    public MemeResponse memeResponse;
-    public List<Meme> memes;
+    public List<Entry> entries;
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
@@ -48,17 +45,17 @@ public class Fragment1 extends Fragment {
 
 
     private void getModel(View view) {
-        Call<MemeResponse> call = RetrofitClient.getInstance().getMyApi().getModel();
-        call.enqueue(new Callback<MemeResponse>() {
+        Call<Pic> call = RetrofitClient.getInstance().getMyApi().getModel();
+        call.enqueue(new Callback<Pic>() {
             @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
-            public void onResponse(Call<MemeResponse> call, Response<MemeResponse> response) {
+            public void onResponse(Call<Pic> call, Response<Pic> response) {
                 if (!response.isSuccessful()) {
                     Toast.makeText(getContext(), "404", Toast.LENGTH_SHORT).show();
                 } else {
 
-                    memes = response.body().getData().getMemes();
-                    MyListAdapter adapter = new MyListAdapter(getContext(),  memes);
+                    entries = response.body().getEntries();
+                    MyListAdapter adapter = new MyListAdapter(getContext(), entries);
 
                     ListView messageList = view.findViewById(R.id.listView);
 
@@ -71,7 +68,7 @@ public class Fragment1 extends Fragment {
                             // получаем выбранный элемент
                             String prettyString = null;
                             try {
-                                String selectedItemDescription = new ObjectMapper().writeValueAsString(memes.get(position));
+                                String selectedItemDescription = new ObjectMapper().writeValueAsString(entries.get(position));
                                 JSONObject json = new JSONObject(selectedItemDescription);
                                 prettyString = json.toString(4);
 
@@ -92,7 +89,7 @@ public class Fragment1 extends Fragment {
             }
 
             @Override
-            public void onFailure(Call<MemeResponse> call, Throwable t) {
+            public void onFailure(Call<Pic> call, Throwable t) {
                 Toast.makeText(getContext(), "Connection error", Toast.LENGTH_SHORT).show();
             }
 

@@ -8,7 +8,7 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.foxrider.mt_lab2.model.Meme;
+import com.foxrider.mt_lab2.model.Entry;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -20,13 +20,13 @@ public class MyListAdapter extends BaseAdapter {
      * и объекта списка, с которым будет производиться работа
      */
     private LayoutInflater LInflater;
-    private List<Meme> list;
+    private List<Entry> list;
 
     /*
      * Конструктор класса. В данном случае лишь транслируется лист с данными
      * в лист адаптера, с которым будет производиться непосредственная работа
      */
-    public MyListAdapter(Context context, List<Meme> memes) {
+    public MyListAdapter(Context context, List<Entry> memes) {
 
         list = memes;
         LInflater = (LayoutInflater) context
@@ -46,7 +46,7 @@ public class MyListAdapter extends BaseAdapter {
     }
 
     @Override
-    public Meme getItem(int position) {
+    public Entry getItem(int position) {
         return list.get(position);
     }
 
@@ -71,7 +71,7 @@ public class MyListAdapter extends BaseAdapter {
         if (v == null) {
             holder = new ViewHolder();
             v = LInflater.inflate(R.layout.list_item, parent, false);
-            holder.memeImage = (ImageView) v.findViewById(R.id.memeImage);
+            holder.textView2 = (TextView) v.findViewById(R.id.textView2);
             holder.name = (TextView) v.findViewById(R.id.name);
             v.setTag(holder);
         }
@@ -83,13 +83,10 @@ public class MyListAdapter extends BaseAdapter {
          * передаются во внешний вид элемента
          */
         holder = (ViewHolder) v.getTag();
-        Meme meme = getData(position);
+        Entry entry = getData(position);
 
-        Picasso.with(v.getContext())
-                .load(meme.getURL())
-                .resize(140, 140)
-                .into(holder.memeImage);
-        holder.name.setText(meme.getName());
+        holder.textView2.setText(entry.getAPI());
+        holder.name.setText(entry.getCategory());
 
         return v;
     }
@@ -98,7 +95,7 @@ public class MyListAdapter extends BaseAdapter {
      * Метод, который забирает объект из ArrayList для дальнейшей работы с ним
      * и передачи его данных в элемент ListView
      */
-    Meme getData(int position) {
+    Entry getData(int position) {
         return (getItem(position));
     }
 
@@ -108,7 +105,7 @@ public class MyListAdapter extends BaseAdapter {
      * на другую, что достигается тегированием каждого элемента ListView
      */
     private static class ViewHolder {
-        private ImageView memeImage;
+        private TextView textView2;
         private TextView name;
     }
 }
